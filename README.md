@@ -6,7 +6,7 @@ Aka: Spectre and Meltdown Kernel side-channel attacks.
 # Usage
 1. Set your inventory under [Check]
 2. Ensure `ansible_user` variable is **root**
-3. Make sure ScriptUrl variable is set appropriately.
+3. Make sure `ScriptUrl` variable is set appropriately.
 
 You can run the playbook like so:
 

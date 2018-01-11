@@ -1,6 +1,6 @@
 ---
 # vim: sw=2 ai expandtab ts=2
-- name: Provision Demo VMs
+- name: Check hosts for meltdown and spectre
   hosts: Check
   gather_facts: false
   force_handlers: true
