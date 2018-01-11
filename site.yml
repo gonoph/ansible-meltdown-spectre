@@ -1,0 +1,72 @@
+---
+# vim: sw=2 ai expandtab ts=2
+- name: Provision Demo VMs
+  hosts: Check
+  gather_facts: false
+  force_handlers: true
+  connection: smart
+  handlers:
+    - name: remove script_file
+      changed_when: false
+      connection: local
+      run_once: true
+      file:
+        path: "{{ script_file.path }}"
+        state: absent
+
+    - name: remove remote_script
+      changed_when: false
+      file:
+        path: "{{ script_file.path }}"
+        state: absent
+
+  tasks:
+    - name: Create script_file
+      changed_when: false
+      connection: local
+      run_once: true
+      tempfile:
+      register: script_file
+      notify: remove script_file
+
+    - name: Download script locally
+      changed_when: false
+      connection: local
+      run_once: true
+      get_url:
+        dest: "{{ script_file.path }}"
+        url: "{{ ScriptUrl }}"
+        force: yes
+
+    - name: Copy script to server
+      changed_when: false
+      copy:
+        src: "{{ script_file.path }}"
+        dest: "{{ script_file.path }}"
+        mode: 0755
+      notify: remove remote_script
+
+    - name: execute script
+      changed_when: false
+      register: script_output
+      command: "{{ script_file.path }}"
+      failed_when: script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
+
+    - name: map vulnerabilites
+      set_fact:
+        map:
+          Spectre1: "{{ (2).__and__(script_output.rc | int) == (2) }}"
+          Spectre2: "{{ (4).__and__(script_output.rc | int) == (4) }}"
+          Meltdown: "{{ (8).__and__(script_output.rc | int) == (8) }}"
+
+    - name: remove temp files
+      meta: flush_handlers
+
+    - name: highlight vulnerabilites
+      changed_when: "map[item] == True"
+      set_fact:
+        junk: false
+      with_items:
+        - Spectre1
+        - Spectre2
+        - Meltdown
