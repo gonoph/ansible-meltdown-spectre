@@ -14,12 +14,20 @@ You can run the playbook like so:
 ansible-playbook -i inventory site.yml
 ```
 
-Hosts that are vulnerable will show up as "changed", and under the `highlight vulnerabilites` task, you will see what vulnerability they have:
+Hosts that are vulnerable will show up as **failed** with a message of what vulnerabiliy was found. Additionally under the `highlight vulnerabilites` task, you will see the vulnerability that was found as a **changed** task.
 
 ```
+TASK [highlight vulnerabilites] ******
+ok: [store1] => (item=Spectre1)
 ok: [oldgw] => (item=Spectre1)
 changed: [oldgw] => (item=Spectre2)
 ok: [oldgw] => (item=Meltdown)
+changed: [store1] => (item=Spectre2)
+ok: [store1] => (item=Meltdown)
+
+TASK [Error if vulnerabilities] ******
+fatal: [store1]: FAILED! => {"changed": false, "failed": true, "msg": "found vulnerabilites: Spectre2"}
+fatal: [oldgw]: FAILED! => {"changed": false, "failed": true, "msg": "found vulnerabilites: Spectre2"}
 ```
 
 # References
