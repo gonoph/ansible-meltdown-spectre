@@ -94,8 +94,7 @@
 
     - name: highlight vulnerabilites
       register: vulnerabilites
-      failed_when: "v_map[item] == True"
-      ignore_errors: true
+      changed_when: "v_map[item] == True"
       set_fact:
         junk: false
       with_items:
@@ -104,6 +103,6 @@
         - Meltdown
 
     - name: Error if vulnerabilities
-      when: vulnerabilites.failed
+      when: vulnerabilites.changed
       fail:
         msg: "found vulnerabilites: {{ dict(v_map.items() | selectattr('1') | list ).keys() | join(', ') }}"
