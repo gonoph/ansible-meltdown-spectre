@@ -24,6 +24,7 @@ ok: [oldgw] => (item=Meltdown)
 
 # References
 Red Hat Knowledge article: https://access.redhat.com/security/vulnerabilities/speculativeexecution
+
 What is Spectre and Meltdown: https://www.redhat.com/en/blog/what-are-meltdown-and-spectre-heres-what-you-need-know
 
 # Disclaimer
