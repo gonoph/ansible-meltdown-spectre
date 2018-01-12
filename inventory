@@ -8,4 +8,4 @@ ocp-master2
 
 [Check:vars]
 ansible_user=root
-ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--34eca07.sh
+ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh
