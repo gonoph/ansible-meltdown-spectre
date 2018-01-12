@@ -7,30 +7,37 @@
   connection: smart
   handlers:
     - name: remove script_file
-      changed_when: false
+      listen: remove temp files
       connection: local
       run_once: true
       file:
         path: "{{ script_file.path }}"
         state: absent
 
+    - name: remove script_file_sig
+      listen: remove temp files
+      when: gpg2.stdout | default('')
+      connection: local
+      run_once: true
+      file:
+        path: "{{ script_file.path }}.asc"
+        state: absent
+
     - name: remove remote_script
-      changed_when: false
+      listen: remove remote temp files
       file:
         path: "{{ script_file.path }}"
         state: absent
 
   tasks:
     - name: Create script_file
-      changed_when: false
       connection: local
       run_once: true
       tempfile:
       register: script_file
-      notify: remove script_file
+      notify: remove temp files
 
     - name: Download script locally
-      changed_when: false
       connection: local
       run_once: true
       get_url:
@@ -38,35 +45,65 @@
         url: "{{ ScriptUrl }}"
         force: yes
 
-    - name: Copy script to server
+    - name: Check gpg2 is installed
+      when: ScriptGpgSigUrl is defined and ScriptGpgSigUrl | length > 0
+      connection: local
+      run_once: true
+      command: /usr/bin/which gpg2
       changed_when: false
+      failed_when: false
+      register: gpg2
+
+    - name: Download script gpg2 sig locally
+      when: gpg2.stdout | default('')
+      connection: local
+      run_once: true
+      get_url:
+        dest: "{{ script_file.path }}.asc"
+        url: "{{ ScriptGpgSigUrl }}"
+        mode: 0600
+        force: yes
+
+    - name: check gpg2 signature of script
+      connection: local
+      run_once: true
+      when: gpg2.stdout | default('')
+      command: "{{ gpg2.stdout }} --auto-key-locate keyserver --keyserver hkp://keys.gnupg.net --keyserver-options auto-key-retrieve {{ script_file.path }}.asc"
+
+    - name: Copy script to server
       copy:
         src: "{{ script_file.path }}"
         dest: "{{ script_file.path }}"
         mode: 0755
-      notify: remove remote_script
+      notify: remove remote temp files
 
     - name: execute script
-      changed_when: false
       register: script_output
       command: "{{ script_file.path }}"
       failed_when: script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
 
+    - name: remove temp files
+      meta: flush_handlers
+
     - name: map vulnerabilites
       set_fact:
-        map:
+        v_map:
           Spectre1: "{{ (2).__and__(script_output.rc | int) == (2) }}"
           Spectre2: "{{ (4).__and__(script_output.rc | int) == (4) }}"
           Meltdown: "{{ (8).__and__(script_output.rc | int) == (8) }}"
 
-    - name: remove temp files
-      meta: flush_handlers
-
     - name: highlight vulnerabilites
-      changed_when: "map[item] == True"
+      register: vulnerabilites
+      failed_when: "v_map[item] == True"
+      ignore_errors: true
       set_fact:
         junk: false
       with_items:
         - Spectre1
         - Spectre2
         - Meltdown
+
+    - name: Error if vulnerabilities
+      when: vulnerabilites.failed
+      fail:
+        msg: "found vulnerabilites: {{ dict(v_map.items() | selectattr('1') | list ).keys() | join(', ') }}"
