@@ -39,4 +39,4 @@ Red Hat Knowledge article: https://access.redhat.com/security/vulnerabilities/sp
 What is Spectre and Meltdown: https://www.redhat.com/en/blog/what-are-meltdown-and-spectre-heres-what-you-need-know
 
 # Disclaimer
-I wrote this on my own time for my own purposes, this playbook is not official, not endorsed, not supported, nor maintained by Red Hat.
+I wrote this on my own time for my own purposes. This playbook is not official, not endorsed, not supported, nor maintained by Red Hat.
