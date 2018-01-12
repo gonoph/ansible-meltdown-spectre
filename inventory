@@ -1,4 +1,4 @@
-[Check:children]
+[Check]
 router
 ocp-node1
 ocp-node2
@@ -9,3 +9,4 @@ ocp-master2
 [Check:vars]
 ansible_user=root
 ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh
+ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh.asc_.txt
