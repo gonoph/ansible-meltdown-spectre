@@ -7,12 +7,15 @@ Aka: Spectre and Meltdown Kernel side-channel attacks.
 1. Set your inventory under [Check]
 2. Ensure `ansible_user` variable is **root**
 3. Make sure `ScriptUrl` variable is set appropriately.
+4. Make sure `ScriptGpgSigUrl` variable is set correctly - if you want to verify the GPG2 signature of the script.
 
 You can run the playbook like so:
 
 ```bash
 ansible-playbook -i inventory site.yml
 ```
+
+Playbook will automatically download the check script and verify the GPG2 signature if the `ScriptGpgSigUrl` variable is defined.
 
 Hosts that are vulnerable will show up as **failed** with a message of what vulnerabiliy was found. Additionally under the `highlight vulnerabilites` task, you will see the vulnerability that was found as a **changed** task.
 
