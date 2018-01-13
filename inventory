@@ -23,7 +23,6 @@ ocp-master2
 # check_use_become is the internal variable used to check if a task should switch to root
 ansible_user=service1
 ansible_become_pass=password
-check_use_become=True
 
 ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh
 ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh.asc_.txt

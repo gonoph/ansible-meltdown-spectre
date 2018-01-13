@@ -10,7 +10,6 @@
       listen: remove temp files
       connection: local
       run_once: true
-      become: false
       file:
         path: "{{ script_file.path }}"
         state: absent
@@ -20,14 +19,12 @@
       when: gpg2.stdout | default('')
       connection: local
       run_once: true
-      become: false
       file:
         path: "{{ script_file.path }}.asc"
         state: absent
 
     - name: remove remote_script
       listen: remove remote temp files
-      become: false
       file:
         path: "{{ remote_script_file.path }}"
         state: absent
@@ -36,7 +33,6 @@
     - name: Create script_file
       connection: local
       run_once: true
-      become: false
       tempfile:
       register: script_file
       notify: remove temp files
@@ -44,7 +40,6 @@
     - name: Download script locally
       connection: local
       run_once: true
-      become: false
       get_url:
         dest: "{{ script_file.path }}"
         url: "{{ ScriptUrl }}"
@@ -54,7 +49,6 @@
       when: ScriptGpgSigUrl is defined and ScriptGpgSigUrl | length > 0
       connection: local
       run_once: true
-      become: false
       command: /usr/bin/which gpg2
       changed_when: false
       failed_when: false
@@ -64,7 +58,6 @@
       when: gpg2.stdout | default('')
       connection: local
       run_once: true
-      become: false
       get_url:
         dest: "{{ script_file.path }}.asc"
         url: "{{ ScriptGpgSigUrl }}"
@@ -74,18 +67,15 @@
     - name: check gpg2 signature of script
       connection: local
       run_once: true
-      become: false
       when: gpg2.stdout | default('')
       command: "{{ gpg2.stdout }} --auto-key-locate keyserver --keyserver hkp://keys.gnupg.net --keyserver-options auto-key-retrieve {{ script_file.path }}.asc"
 
     - name: Create remote script_file
-      become: false
       tempfile:
       register: remote_script_file
       notify: remove temp files
 
     - name: Copy script to server
-      become: false
       copy:
         src: "{{ script_file.path }}"
         dest: "{{ remote_script_file.path }}"
@@ -93,13 +83,21 @@
       notify: remove remote temp files
 
     - name: execute script
-      become: "{{ check_use_become }}"
+      become: "{{ ansible_user != 'root' }}"
       register: script_output
       command: "{{ remote_script_file.path }}"
-      failed_when: script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
+      failed_when: |
+        script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
+        or 'For more information see:' not in script_output.stdout_lines
 
     - name: remove temp files
       meta: flush_handlers
+
+    - name: check that debugfs was mounted
+      fail:
+        msg: "debugfs wasn't readable - running remote script as root?"
+      when: |
+        '/sys/kernel/debug/x86 is either not mounted or not accessible' in script_output.stdout_lines
 
     - name: map vulnerabilites
       set_fact:

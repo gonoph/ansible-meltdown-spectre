@@ -5,9 +5,10 @@ Aka: Spectre and Meltdown Kernel side-channel attacks.
 
 # Usage
 1. Set your inventory under [Check]
-2. Ensure `ansible_user` variable is **root**
-3. Make sure `ScriptUrl` variable is set appropriately.
-4. Make sure `ScriptGpgSigUrl` variable is set correctly - if you want to verify the GPG2 signature of the script.
+2. Ensure `ansible_user` variable is set for a valid user, use host variables if needed.
+3. Make sure `ansible_become_pass` has a valid password **IF** password-less sudo is not enabled.
+4. Make sure `ScriptUrl` variable is set appropriately.
+5. Make sure `ScriptGpgSigUrl` variable is set correctly - if you want to verify the GPG2 signature of the script.
 
 You can run the playbook like so:
 
