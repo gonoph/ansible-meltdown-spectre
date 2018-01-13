@@ -1,12 +1,29 @@
 [Check]
-router
+# vim: ai expandtab filetype=dosini
+# you can define a different sudo password like below
+# or you can setup password less sudo
+router ansible_become_pass=different_password
+
+# you can define a special user for a host like below
+rhv-host ansible_user=service2
+
 ocp-node1
 ocp-node2
-rhv-host
 ocp-master1
 ocp-master2
 
 [Check:vars]
-ansible_user=root
+# if you don't want to use sudo and just log in as root, uncomment the two lines below
+# ansible_user=root
+# check_use_become=False
+
+# if you uncommented the two lines above, then comment out the next 3 settings
+# ansible_user defines the user that will be used to login to the hosts
+# ansible_become_pass defines the password for sudo in order to "become" the root user
+# check_use_become is the internal variable used to check if a task should switch to root
+ansible_user=service1
+ansible_become_pass=password
+check_use_become=True
+
 ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh
 ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a2f5749.sh.asc_.txt
