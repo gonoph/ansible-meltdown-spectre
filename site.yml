@@ -26,7 +26,7 @@
     - name: remove remote_script
       listen: remove remote temp files
       file:
-        path: "{{ script_file.path }}"
+        path: "{{ remote_script_file.path }}"
         state: absent
 
   tasks:
@@ -70,16 +70,21 @@
       when: gpg2.stdout | default('')
       command: "{{ gpg2.stdout }} --auto-key-locate keyserver --keyserver hkp://keys.gnupg.net --keyserver-options auto-key-retrieve {{ script_file.path }}.asc"
 
+    - name: Create remote script_file
+      tempfile:
+      register: remote_script_file
+      notify: remove temp files
+
     - name: Copy script to server
       copy:
         src: "{{ script_file.path }}"
-        dest: "{{ script_file.path }}"
+        dest: "{{ remote_script_file.path }}"
         mode: 0755
       notify: remove remote temp files
 
     - name: execute script
       register: script_output
-      command: "{{ script_file.path }}"
+      command: "{{ remote_script_file.path }}"
       failed_when: script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
 
     - name: remove temp files
