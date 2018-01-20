@@ -1,10 +1,10 @@
 [Check]
 # vim: ai expandtab filetype=dosini
-# you can define a different sudo password like below
+# you can define a different sudo password for a single host like below
 # or you can setup password less sudo
 router ansible_become_pass=different_password
 
-# you can define a special user for a host like below
+# you can define a special user for a single host like below
 rhv-host ansible_user=service2
 
 ocp-node1
@@ -13,14 +13,12 @@ ocp-master1
 ocp-master2
 
 [Check:vars]
-# if you don't want to use sudo and just log in as root, uncomment the two lines below
+# if you don't want to use sudo and just log in as root, uncomment the line below
 # ansible_user=root
-# check_use_become=False
 
-# if you uncommented the two lines above, then comment out the next 3 settings
+# if you uncommented the line above, then comment out the next 2 settings
 # ansible_user defines the user that will be used to login to the hosts
 # ansible_become_pass defines the password for sudo in order to "become" the root user
-# check_use_become is the internal variable used to check if a task should switch to root
 ansible_user=service1
 ansible_become_pass=password
 
