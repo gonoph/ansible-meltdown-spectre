@@ -88,7 +88,7 @@
       command: "{{ remote_script_file.path }}"
       failed_when: |
         script_output.rc not in [ 0, 2, 4, 6, 8, 10, 12, 14 ]
-        or 'For more information see:' not in script_output.stdout_lines
+        or 'For more information about the vulnerabilities see:' not in script_output.stdout_lines
 
     - name: remove temp files
       meta: flush_handlers
