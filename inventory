@@ -22,5 +22,5 @@ ocp-master2
 ansible_user=service1
 ansible_become_pass=password
 
-ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a79614b.sh
-ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--a79614b.sh.asc_.txt
+ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-05-23-1220.sh
+ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-05-23-1220.sh.asc
