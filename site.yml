@@ -1,10 +1,48 @@
 ---
 # vim: sw=2 ai expandtab ts=2
+- name: Download check scripts
+  hosts: Download
+  gather_facts: false
+  force_handlers: true
+  connection: local
+  tasks:
+    - name: Create script_file
+      run_once: true
+      tempfile:
+      register: script_file
+
+    - name: Download script locally
+      run_once: true
+      get_url:
+        dest: "{{ script_file.path }}"
+        url: "{{ ScriptUrl }}"
+        force: yes
+
+    - name: Check gpg2 is installed
+      when: ScriptGpgSigUrl is defined and ScriptGpgSigUrl | length > 0
+      run_once: true
+      command: /usr/bin/which gpg2
+      changed_when: false
+      failed_when: false
+      register: gpg2
+
+    - name: Download script gpg2 sig locally
+      when: gpg2.stdout | default('')
+      run_once: true
+      get_url:
+        dest: "{{ script_file.path }}.asc"
+        url: "{{ ScriptGpgSigUrl }}"
+        mode: 0600
+        force: yes
+
 - name: Check hosts for meltdown and spectre
   hosts: Check
   gather_facts: false
   force_handlers: true
   connection: smart
+  vars:
+    gpg2: "{{ hostvars.localhost.gpg2 }}"
+    script_file: "{{ hostvars.localhost.script_file }}"
   handlers:
     - name: remove script_file
       listen: remove temp files
@@ -30,39 +68,12 @@
         state: absent
 
   tasks:
-    - name: Create script_file
-      connection: local
+
+    - name: ensure temp files are removed
       run_once: true
-      tempfile:
-      register: script_file
+      set_fact:
+      changed_when: true
       notify: remove temp files
-
-    - name: Download script locally
-      connection: local
-      run_once: true
-      get_url:
-        dest: "{{ script_file.path }}"
-        url: "{{ ScriptUrl }}"
-        force: yes
-
-    - name: Check gpg2 is installed
-      when: ScriptGpgSigUrl is defined and ScriptGpgSigUrl | length > 0
-      connection: local
-      run_once: true
-      command: /usr/bin/which gpg2
-      changed_when: false
-      failed_when: false
-      register: gpg2
-
-    - name: Download script gpg2 sig locally
-      when: gpg2.stdout | default('')
-      connection: local
-      run_once: true
-      get_url:
-        dest: "{{ script_file.path }}.asc"
-        url: "{{ ScriptGpgSigUrl }}"
-        mode: 0600
-        force: yes
 
     - name: check gpg2 signature of script
       connection: local

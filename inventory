@@ -1,3 +1,6 @@
+[Download]
+localhost
+
 [Check]
 # vim: ai expandtab filetype=dosini
 # you can define a different sudo password for a single host like below
@@ -22,5 +25,5 @@ ocp-master2
 ansible_user=service1
 ansible_become_pass=password
 
-ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-05-23-1220.sh
-ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-05-23-1220.sh.asc
+ScriptUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-07-20-1546.sh
+ScriptGpgSigUrl=https://access.redhat.com/sites/default/files/spectre-meltdown--2018-07-20-1546.sh.asc
